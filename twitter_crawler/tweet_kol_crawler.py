@@ -8,7 +8,7 @@ import json
 
 # Specify the JSON filename
 json_filename = 'output.json'
-def convert_to_json(data, json_filename):
+def convert_to_json(data, json_filename=json_filename):
     # Open the JSON file in write mode
     data = [dict(t) for t in {tuple(d.items()) for d in data}]
     with open(json_filename, 'w', encoding='utf-8') as json_file:
