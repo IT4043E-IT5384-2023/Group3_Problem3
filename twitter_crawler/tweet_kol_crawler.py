@@ -10,7 +10,7 @@ import json
 json_filename = 'output.json'
 def convert_to_json(data, json_filename=json_filename):
     # Open the JSON file in write mode
-    data = {frozenset(item.items()) : item for item in data}.values()
+    data = [i for n, i in enumerate(data) if i not in data[:n]]
     with open(json_filename, 'w', encoding='utf-8') as json_file:
         # Write the data to the JSON file
         for tweet in data:
