@@ -145,10 +145,9 @@ if __name__ == "__main__":
     
     # Login Twitter account
     app = Twitter("session")
-#    with open("keys/account.key", "r") as f:
-#        username, password, key = f.read().split()
-#    app.sign_in(username, password, extra=key)
-    app.sign_in('lancuongng_test', 'lancuong2002',extra = 's2asjepg')
+    with open("keys/account.key", "r") as f:
+        username, password, key = f.read().split()
+    app.sign_in(username, password, extra=key)
 
     # Crawl tweets and kols
     tweets_df, kols_df = crawl_tweet_kol(
