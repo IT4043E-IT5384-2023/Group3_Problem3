@@ -154,7 +154,7 @@ if __name__ == "__main__":
         app = app,
         keywords=config['keywords'],
         min_faves=config['min_faves'],
-        min_retweets=config['min_retweets'],
+        min_retweets=config['min_retweet'],
         pages=config['pages'],
         wait_time=config['wait_time']
     )
