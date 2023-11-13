@@ -10,7 +10,7 @@ import json
 json_filename = 'output.json'
 def convert_to_json(data, json_filename=json_filename):
     # Open the JSON file in write mode
-    data = [dict(t) for t in {tuple(d.items()) for d in data}]
+    data = {frozenset(item.items()) : item for item in data}.values()
     with open(json_filename, 'w', encoding='utf-8') as json_file:
         # Write the data to the JSON file
         for tweet in data:
@@ -74,7 +74,7 @@ def crawl_tweet_kol(
         print(f"Crawling for keyword {keyword}")
         
         all_tweets = app.search(f"{keyword} min_faves:{min_faves} min_retweets:{min_retweets}", pages = pages, wait_time = wait_time)
-        convert_to_json(all_tweets)
+        convert_to_json(all_tweets,f"{keyword}.json")
         for tweet in all_tweets:
             tweet_data = tweet.__dict__
             author_data = tweet['author'].__dict__
@@ -145,10 +145,11 @@ if __name__ == "__main__":
     
     # Login Twitter account
     app = Twitter("session")
-    with open("keys/account.key", "r") as f:
-        username, password, key = f.read().split()
-    app.sign_in(username, password, extra=key)
-    
+#    with open("keys/account.key", "r") as f:
+#        username, password, key = f.read().split()
+#    app.sign_in(username, password, extra=key)
+    app.sign_in('lancuongng_test', 'lancuong2002',extra = 's2asjepg')
+
     # Crawl tweets and kols
     tweets_df, kols_df = crawl_tweet_kol(
         app = app,
