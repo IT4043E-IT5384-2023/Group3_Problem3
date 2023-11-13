@@ -1,5 +1,6 @@
 # Optional files/extensions
 *.key
+*.tw_session
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

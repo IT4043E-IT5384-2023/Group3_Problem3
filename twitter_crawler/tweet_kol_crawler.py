@@ -1,17 +1,20 @@
 from typing import List, Union
 from tweety import Twitter
-from utils import read_yaml
 import pandas as pd
 import os
 import json
-import json
+import sys
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+from utils import read_yaml
 
 # Specify the JSON filename
 json_filename = 'output.json'
 def convert_to_json(data, json_filename=json_filename):
     # Open the JSON file in write mode
     data = [i for n, i in enumerate(data) if i not in data[:n]]
-    with open(json_filename, 'w', encoding='utf-8') as json_file:
+    with open(os.path.join("data", json_filename), 'w', encoding='utf-8') as json_file:
         # Write the data to the JSON file
         for tweet in data:
           json.dump(tweet, json_file, ensure_ascii=False, indent=4, default = str)
@@ -24,7 +27,7 @@ def crawl_tweet_kol(
     min_retweets: int = 10,
     pages: int = 10,
     wait_time: int = 30
-) -> List[pd.DataFrame, pd.DataFrame]:
+) -> List[pd.DataFrame]:
     
     """
     Crawl tweets and KOL accounts from Twitter.
@@ -160,5 +163,5 @@ if __name__ == "__main__":
     )
     
     # Save data
-    tweets_df.to_csv("tweets_table.csv", index=False, encoding='utf-8')
-    kols_df.to_csv("kols_table.csv", index=False, encoding='utf-8')
+    tweets_df.to_csv("data/tweets_table.csv", index=False, encoding='utf-8')
+    kols_df.to_csv("data/kols_table.csv", index=False, encoding='utf-8')
