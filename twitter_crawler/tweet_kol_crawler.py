@@ -3,6 +3,19 @@ from tweety import Twitter
 from utils import read_yaml
 import pandas as pd
 import os
+import json
+import json
+
+# Specify the JSON filename
+json_filename = 'output.json'
+def convert_to_json(data, json_filename):
+    # Open the JSON file in write mode
+    data = [dict(t) for t in {tuple(d.items()) for d in data}]
+    with open(json_filename, 'w', encoding='utf-8') as json_file:
+        # Write the data to the JSON file
+        for tweet in data:
+          json.dump(tweet, json_file, ensure_ascii=False, indent=4, default = str)
+
 
 def crawl_tweet_kol(
     app,
@@ -61,6 +74,7 @@ def crawl_tweet_kol(
         print(f"Crawling for keyword {keyword}")
         
         all_tweets = app.search(f"{keyword} min_faves:{min_faves} min_retweets:{min_retweets}", pages = pages, wait_time = wait_time)
+        convert_to_json(all_tweets)
         for tweet in all_tweets:
             tweet_data = tweet.__dict__
             author_data = tweet['author'].__dict__
