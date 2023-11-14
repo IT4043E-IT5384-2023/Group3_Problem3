@@ -3,6 +3,10 @@ keywords:
   - 'crypto'
   - 'bitcoin'
   - 'cryptocurrency'
+  - 'aave'
+  - 'bnb'
+  - 'defi'
+  - 'uniswap'
   # - 'btc'
   # - 'eth'
   # - 'etherum'
@@ -18,5 +22,5 @@ keywords:
   # - 'binancesmartchain'
 min_faves: 100
 min_retweet: 10
-pages: 25
+pages: 30
 wait_time: 30
