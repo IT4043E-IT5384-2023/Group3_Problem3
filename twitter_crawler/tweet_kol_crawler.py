@@ -10,7 +10,7 @@ import json
 json_filename = 'output.json'
 def convert_to_json(data, json_filename=json_filename):
     # Open the JSON file in write mode
-    data = {frozenset(item.items()) : item for item in data}.values()
+    data = [i for n, i in enumerate(data) if i not in data[:n]]
     with open(json_filename, 'w', encoding='utf-8') as json_file:
         # Write the data to the JSON file
         for tweet in data:
@@ -53,6 +53,8 @@ def crawl_tweet_kol(
     like_counts = []
     reply_counts = []
     quote_counts = []
+    bookmark_counts = []
+    hashtags = []
     author_id = []
     views = []
     retweet_counts = []
@@ -69,6 +71,12 @@ def crawl_tweet_kol(
     favourites_count = []
     followers_count = []
     profile_url = []
+    possibly_sensitive = []
+    screen_name = []
+    listed_count = []
+    normal_followers_count = []
+    fast_followers_count = []
+    friends_count = []
 
     for keyword in keywords:
         print(f"Crawling for keyword {keyword}")
@@ -88,6 +96,8 @@ def crawl_tweet_kol(
             like_counts.append(tweet_data['likes'])
             reply_counts.append(tweet_data['reply_counts'])
             quote_counts.append(tweet_data['quote_counts'])
+            bookmark_counts.append(tweet_data['bookmark_count'])
+            hashtags.append(tweet_data['hashtags'])
             author_id.append(author_data['id'])
             views.append(tweet_data['views'])
             retweet_counts.append(tweet_data['retweet_counts'])
@@ -97,12 +107,18 @@ def crawl_tweet_kol(
             user_id.append(author_data['id'])
             username.append(author_data['username'])
             name.append(author_data['name'])
+            screen_name.append(author_data['screen_name'])
             created_at.append(author_data['created_at'])
             is_verified.append(author_data['verified'])
             media_count.append(author_data['media_count'])
+            listed_count.append(author_data['listed_count'])
             statuses_count.append(author_data['statuses_count'])
             favourites_count.append(author_data['favourites_count'])
             followers_count.append(author_data['followers_count'])
+            normal_followers_count.append(author_data['normal_followers_count'])
+            fast_followers_count.append(author_data['fast_followers_count'])
+            friends_count.append(author_data['friends_count'])
+            possibly_sensitive.append(author_data['possibly_sensitive'])
             profile_url.append(author_data['profile_url'])
             
     first_table_df = pd.DataFrame({
@@ -114,22 +130,31 @@ def crawl_tweet_kol(
         'like_counts': like_counts,
         'reply_counts': reply_counts,
         'quote_counts': quote_counts,
+        'bookmark_counts': bookmark_counts,
+        'hashtags': hashtags,
         'author_id': author_id,
         'views': views,
         'retweet_counts': retweet_counts,
         'url': url
+
     })
 
     second_table_df = pd.DataFrame({
         'user_id': user_id,
         'username': username,
         'name': name,
+        'screen_name' : screen_name,
         'created_at': created_at,
         'is_verified': is_verified,
+        'listed_count': listed_count,
         'media_count': media_count,
         'statuses_count': statuses_count,
         'favourites_count': favourites_count,
         'followers_count': followers_count,
+        'normal_followers_count': normal_followers_count,
+        'friends_count': friends_count,
+        'possibly_sensitive' : possibly_sensitive,
+        'fast_followers_count' : fast_followers_count,
         'profile_url': profile_url
     })
 
