@@ -1,5 +1,8 @@
 # Optional files/extensions
 *.key
+*.tw_session
+data/
+test.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
