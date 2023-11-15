@@ -89,7 +89,7 @@ def crawl_tweet_kol(
         if since:
             search_str += f" since:{since}"
         if until:
-            search_str += f"until:{until}"
+            search_str += f" until:{until}"
         all_tweets = app.search(search_str, pages = pages, wait_time = wait_time)
         if since and until:
             convert_to_json(all_tweets,f"{keyword}_{since}_{until}.json")
@@ -201,6 +201,7 @@ if __name__ == "__main__":
     until = args.until
 
     keywords = args.keywords.split(",")
+
     app = Twitter("session")
     app.sign_in(username, password,extra = key)
     tweets_df, kols_df = crawl_tweet_kol(app, keywords, min_faves, min_retweets, pages, wait_time, since, until)
