@@ -11,8 +11,7 @@ sys.path.append(parent)
 from utils import read_yaml
 
 # Specify the JSON filename
-json_filename = 'output.json'
-def convert_to_json(data, json_filename=json_filename):
+def convert_to_json(data, json_filename):
     # Open the JSON file in write mode
     data = [i for n, i in enumerate(data) if i not in data[:n]]
     with open(os.path.join("data", json_filename), 'w', encoding='utf-8') as json_file:
@@ -87,10 +86,15 @@ def crawl_tweet_kol(
     for keyword in keywords:
         print(f"Crawling for keyword {keyword}")
         search_str = f"{keyword} min_faves:{min_faves} min_retweets:{min_retweets}"
-        if since and until:
-            search_str += f" since:{since} until:{until}"
+        if since:
+            search_str += f" since:{since}"
+        if until:
+            search_str += f"until:{until}"
         all_tweets = app.search(search_str, pages = pages, wait_time = wait_time)
-        convert_to_json(all_tweets,f"{keyword}.json")
+        if since and until:
+            convert_to_json(all_tweets,f"{keyword}_{since}_{until}.json")
+        else:
+            convert_to_json(all_tweets,f"{keyword}.json")
         for tweet in all_tweets:
             tweet_data = tweet.__dict__
             author_data = tweet['author'].__dict__
@@ -200,6 +204,13 @@ if __name__ == "__main__":
     app = Twitter("session")
     app.sign_in(username, password,extra = key)
     tweets_df, kols_df = crawl_tweet_kol(app, keywords, min_faves, min_retweets, pages, wait_time, since, until)
-    tweets_df.to_csv("data/tweets_table.csv", index=False, encoding='utf-8')
-    kols_df.to_csv("data/kols_table.csv", index=False, encoding='utf-8')
+
+    name_extension = f'{args.keywords}_mf{min_faves}_mr{min_retweets}'
+    if since:
+        name_extension += f'_since{since}'
+    if until:
+        name_extension += f'_until{until}'
+
+    tweets_df.to_csv(f"data/tweets_{name_extension}.csv", index=False, encoding='utf-8')
+    kols_df.to_csv(f"data/kols_table_{name_extension}.csv", index=False, encoding='utf-8')
     
