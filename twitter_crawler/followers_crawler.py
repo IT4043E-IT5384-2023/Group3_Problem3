@@ -47,33 +47,35 @@ def unpack_all_followers(app,path):
     fl_data = []
     df = pd.read_csv(path)
     kol_list = df['screen_name'].tolist()
-    print(kol_list)
     for kol in kol_list:
         gfl = get_follow(kol)
         if gfl:
             fl_list.extend(gfl)
 
     for follower in fl_list:
-        user = app.get_user_info(follower)
-        time.sleep(2)
-        fl_data.append(user)
+        try:
+            user = app.get_user_info(follower)
+            time.sleep(2)
+            fl_data.append(user)
 
-        user_id.append(user['id'])
-        username.append(user['username'])
-        name.append(user['name'])
-        screen_name.append(user['screen_name'])
-        created_at.append(user['created_at'])
-        is_verified.append(user['verified'])
-        media_count.append(user['media_count'])
-        listed_count.append(user['listed_count'])
-        statuses_count.append(user['statuses_count'])
-        favourites_count.append(user['favourites_count'])
-        followers_count.append(user['followers_count'])
-        normal_followers_count.append(user['normal_followers_count'])
-        fast_followers_count.append(user['fast_followers_count'])
-        friends_count.append(user['friends_count'])
-        possibly_sensitive.append(user['possibly_sensitive'])
-        profile_url.append(user['profile_url'])
+            user_id.append(user['id'])
+            username.append(user['username'])
+            name.append(user['name'])
+            screen_name.append(user['screen_name'])
+            created_at.append(user['created_at'])
+            is_verified.append(user['verified'])
+            media_count.append(user['media_count'])
+            listed_count.append(user['listed_count'])
+            statuses_count.append(user['statuses_count'])
+            favourites_count.append(user['favourites_count'])
+            followers_count.append(user['followers_count'])
+            normal_followers_count.append(user['normal_followers_count'])
+            fast_followers_count.append(user['fast_followers_count'])
+            friends_count.append(user['friends_count'])
+            possibly_sensitive.append(user['possibly_sensitive'])
+            profile_url.append(user['profile_url'])
+        except:
+            continue
 
     followers_table_df = pd.DataFrame({
         'user_id': user_id,
@@ -94,7 +96,7 @@ def unpack_all_followers(app,path):
         'profile_url': profile_url
     })
 
-    convert_to_json(fl_data, 'data/followers.json')
+    convert_to_json(fl_data, 'followers.json')
     return followers_table_df
 
 if __name__=="__main__":
@@ -106,6 +108,6 @@ if __name__=="__main__":
     args = parser.parse_args()
 
     app = Twitter('session')
-    app.sign_in(args.username, args.password)#, extra=args.key)
+    #app.sign_in(args.username, args.password)#, extra=args.key)
 
     followers = unpack_all_followers(app, 'data/kol_test.csv')
