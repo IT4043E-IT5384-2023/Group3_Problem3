@@ -205,7 +205,7 @@ if __name__ == "__main__":
     app.sign_in(username, password,extra = key)
     tweets_df, kols_df = crawl_tweet_kol(app, keywords, min_faves, min_retweets, pages, wait_time, since, until)
 
-    name_extension = f'{args.keywords}_mf{min_faves}_mr{min_retweets}'
+    name_extension = f'{args.keywords}_mf{min_faves}_mr{min_retweets}_p{pages}'
     if since:
         name_extension += f'_since{since}'
     if until:
