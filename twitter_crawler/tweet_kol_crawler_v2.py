@@ -198,7 +198,7 @@ if __name__ == "__main__":
 
     keywords = args.keywords.split(",")
     app = Twitter("session")
-    app.login(username, password,extra = key)
+    app.sign_in(username, password,extra = key)
     tweets_df, kols_df = crawl_tweet_kol(app, keywords, min_faves, min_retweets, pages, wait_time, since, until)
     tweets_df.to_csv("data/tweets_table.csv", index=False, encoding='utf-8')
     kols_df.to_csv("data/kols_table.csv", index=False, encoding='utf-8')
