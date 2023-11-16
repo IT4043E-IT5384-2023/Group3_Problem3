@@ -55,7 +55,7 @@ def unpack_all_followers(app,path):
     for follower in fl_list:
         try:
             user = app.get_user_info(follower)
-            time.sleep(2)
+            #time.sleep(2)
             fl_data.append(user)
 
             user_id.append(user['id'])
@@ -110,4 +110,5 @@ if __name__=="__main__":
     app = Twitter('session')
     #app.sign_in(args.username, args.password)#, extra=args.key)
 
-    followers = unpack_all_followers(app, 'data/kol_test.csv')
+    followers = unpack_all_followers(app, 'data/kols_table_btc_mf100_mr10_p10_since2023-11-14_until2023-11-15.csv')
+    followers.to_csv('data/followers.csv', index=False, encoding='utf-8')
