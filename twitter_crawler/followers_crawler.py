@@ -4,8 +4,9 @@ import pandas as pd
 from tweet_kol_crawler_v2 import convert_to_json
 import argparse
 import time
+from tqdm import tqdm
 
-def get_follow(screenname,listed = [], cursor = None):
+def get_follow(screenname,listed = [], cursor = None, iter=0):
     url = 'https://twitter-api45.p.rapidapi.com/followers.php'
     querystring = {"screenname":screenname}
     if cursor:
@@ -16,13 +17,16 @@ def get_follow(screenname,listed = [], cursor = None):
     }
     response = requests.get(url, headers=headers, params=querystring)
     response = response.json()
+    
+    print(f"\t{screenname} iter {iter}: {len(response['followers'])} followers")
 
     for fl in response['followers']:
         listed.append(fl['screen_name'])
     try:
-        cursor = response['next_cursor']
-        get_follow(screenname,cursor)
+        next_cursor = response['next_cursor']
+        return get_follow(screenname,listed=listed, cursor=next_cursor, iter=iter+1)
     except:
+        print(f"\tCrawled {len(listed)} followers for user {screenname}")
         return listed
     
 def unpack_all_followers(app,path):
@@ -48,11 +52,14 @@ def unpack_all_followers(app,path):
     df = pd.read_csv(path)
     kol_list = df['screen_name'].tolist()
     for kol in kol_list:
+        print(f"Get followers of {kol}...")
         gfl = get_follow(kol)
         if gfl:
             fl_list.extend(gfl)
 
-    for follower in fl_list:
+    print(f"Total number of user to get info: {len(fl_list)}")
+    print("Get followers' info...")
+    for follower in tqdm(fl_list):
         try:
             user = app.get_user_info(follower)
             #time.sleep(2)
@@ -110,5 +117,5 @@ if __name__=="__main__":
     app = Twitter('session')
     #app.sign_in(args.username, args.password)#, extra=args.key)
 
-    followers = unpack_all_followers(app, 'data/kols_table_btc_mf100_mr10_p10_since2023-11-14_until2023-11-15.csv')
+    followers = unpack_all_followers(app, 'data/test.csv')
     followers.to_csv('data/followers.csv', index=False, encoding='utf-8')
