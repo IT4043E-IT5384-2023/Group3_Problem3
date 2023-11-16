@@ -6,28 +6,35 @@ import argparse
 import time
 from tqdm import tqdm
 
-def get_follow(screenname,listed = [], cursor = None, iter=0):
+def get_follow(screenname):
+    l = []
     url = 'https://twitter-api45.p.rapidapi.com/followers.php'
     querystring = {"screenname":screenname}
-    if cursor:
-        querystring["cursor"] = cursor
     headers = {
         "X-RapidAPI-Key": "008eb73edcmsh4bb60f51534fc3ep142f9ajsnb186fcc18eb6",
         "X-RapidAPI-Host": 'twitter-api45.p.rapidapi.com',
     }
-    response = requests.get(url, headers=headers, params=querystring)
-    response = response.json()
     
-    print(f"\t{screenname} iter {iter}: {len(response['followers'])} followers")
-
-    for fl in response['followers']:
-        listed.append(fl['screen_name'])
-    try:
-        next_cursor = response['next_cursor']
-        return get_follow(screenname,listed=listed, cursor=next_cursor, iter=iter+1)
-    except:
-        print(f"\tCrawled {len(listed)} followers for user {screenname}")
-        return listed
+    iter = 0
+    while True:
+        response = requests.get(url, headers=headers, params=querystring)
+        response = response.json()
+        
+        if response['status'] == 'ok':
+            # append followers to list
+            for fl in response['followers']:
+                l.append(fl['screen_name'])
+            
+            # update cursor:
+            querystring["cursor"] = response["next_cursor"]
+            
+            print(f"\t{screenname} iter {iter}: {len(response['followers'])} followers")
+            iter += 1 
+        else:
+            # print(response['status'])
+            break
+    
+    print(f"\tCrawled {len(l)} followers for user {screenname}")
     
 def unpack_all_followers(app,path):
     user_id = []
