@@ -34,6 +34,7 @@ def get_follow(screenname):
             break
     
     print(f"\tCrawled {len(l)} followers for user {screenname}")
+    return l
     
 def unpack_all_followers(app,path):
     user_id = []
