@@ -28,10 +28,9 @@ def get_follow(screenname):
             # update cursor:
             querystring["cursor"] = response["next_cursor"]
             
-            print(f"\t{screenname} iter {iter}: {len(response['followers'])} followers")
+            # print(f"\t{screenname} iter {iter}: {len(response['followers'])} followers")
             iter += 1 
         else:
-            # print(response['status'])
             break
     
     print(f"\tCrawled {len(l)} followers for user {screenname}")
