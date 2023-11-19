@@ -4,11 +4,6 @@ import pandas as pd
 import argparse
 import os
 import json
-import sys
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-from utils import read_yaml
 
 # Specify the JSON filename
 def convert_to_json(data, json_filename):
@@ -202,7 +197,7 @@ if __name__ == "__main__":
 
     keywords = args.keywords.split(",")
 
-    app = Twitter("session")
+    app = Twitter(f"session_{username}")
     app.sign_in(username, password,extra = key)
     tweets_df, kols_df = crawl_tweet_kol(app, keywords, min_faves, min_retweets, pages, wait_time, since, until)
 
@@ -212,6 +207,5 @@ if __name__ == "__main__":
     if until:
         name_extension += f'_until{until}'
 
-    tweets_df.to_csv(f"data/tweets_{name_extension}.csv", index=False, encoding='utf-8')
-    kols_df.to_csv(f"data/kols_table_{name_extension}.csv", index=False, encoding='utf-8')
-    
+    tweets_df.to_csv(f"demo_data/tweets_{name_extension}.csv", index=False, encoding='utf-8')
+    kols_df.to_csv(f"demo_data/kols_table_{name_extension}.csv", index=False, encoding='utf-8')

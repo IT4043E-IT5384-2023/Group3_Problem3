@@ -125,5 +125,5 @@ if __name__=="__main__":
     app = Twitter('session')
     #app.sign_in(args.username, args.password)#, extra=args.key)
 
-    followers = unpack_all_followers(app, 'data/test.csv')
-    followers.to_csv('data/followers.csv', index=False, encoding='utf-8')
+    followers = unpack_all_followers(app, 'demo_data/test.csv')
+    followers.to_csv('demo_data/followers.csv', index=False, encoding='utf-8')

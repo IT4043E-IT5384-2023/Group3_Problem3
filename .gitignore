@@ -3,6 +3,7 @@
 *.tw_session
 data/
 test.ipynb
+my_bash_script*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
