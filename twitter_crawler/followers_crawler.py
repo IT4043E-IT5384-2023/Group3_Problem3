@@ -11,7 +11,7 @@ def get_follow(screenname):
     url = 'https://twitter-api45.p.rapidapi.com/followers.php'
     querystring = {"screenname":screenname}
     headers = {
-        "X-RapidAPI-Key": "008eb73edcmsh4bb60f51534fc3ep142f9ajsnb186fcc18eb6",
+        "X-RapidAPI-Key": "d5a581d56fmsh180438595a24a8ap195b14jsn7fc1c819012e",
         "X-RapidAPI-Host": 'twitter-api45.p.rapidapi.com',
     }
     
@@ -26,8 +26,9 @@ def get_follow(screenname):
                 l.append(fl['screen_name'])
             
             # update cursor:
-            querystring["cursor"] = response["next_cursor"]
-            
+            querystring["cursor"] = response.get("next_cursor", None)
+            if not querystring["cursor"]:
+                break
             # print(f"\t{screenname} iter {iter}: {len(response['followers'])} followers")
             iter += 1 
         else:
