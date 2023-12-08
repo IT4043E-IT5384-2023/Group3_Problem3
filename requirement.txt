@@ -1,3 +1,4 @@
 tweety-ns
 pyyaml
 kafka-python
+pyspark
