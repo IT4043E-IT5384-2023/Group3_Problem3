@@ -5,6 +5,7 @@
 *.json
 test.ipynb
 my_bash_script*
+*.jar
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

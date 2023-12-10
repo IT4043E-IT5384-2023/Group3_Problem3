@@ -1,7 +1,13 @@
+from dotenv import load_dotenv
+load_dotenv()
+
+import os
+SPARK_MASTER = os.getenv("SPARK_MASTER")
+
 from pyspark.sql import SparkSession
 
 def get_spark_session(jobname: str="SimpleSparkJob"):
-    spark = (SparkSession.builder.appName(jobname).master("spark://34.142.194.212:7077") 
+    spark = (SparkSession.builder.appName(jobname).master(f"spark://{SPARK_MASTER}") 
         .config("spark.jars", "/opt/spark/jars/gcs-connector-latest-hadoop2.jar")
         .config("spark.executor.memory", "2G")  #excutor excute only 2G
         .config("spark.driver.memory","4G") 

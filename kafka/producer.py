@@ -1,47 +1,45 @@
 import sys
-from random import choice
-from argparse import ArgumentParser, FileType
-from configparser import ConfigParser
-from confluent_kafka import Producer
+sys.path.append(".")
 
-if __name__ == '__main__':
-    # Parse the command line.
-    parser = ArgumentParser()
-    parser.add_argument('config_file', type=FileType('r'))
-    args = parser.parse_args()
+from kafka import KafkaProducer
+from kafka.errors import KafkaError
 
-    # Parse the configuration.
-    # See https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
-    config_parser = ConfigParser()
-    config_parser.read_file(args.config_file)
-    config = dict(config_parser['default'])
+from dotenv import load_dotenv
+load_dotenv()
 
-    # Create Producer instance
-    producer = Producer(config)
+import json
+from spark_data_processing.utils import get_spark_session
 
-    # Optional per-message delivery callback (triggered by poll() or flush())
-    # when a message has been successfully delivered or permanently
-    # failed delivery (after retries).
-    def delivery_callback(err, msg):
-        if err:
-            print('ERROR: Message failed delivery: {}'.format(err))
-        else:
-            print("Produced event to topic {topic}: key = {key:12} value = {value:12}".format(
-                topic=msg.topic(), key=msg.key().decode('utf-8'), value=msg.value().decode('utf-8')))
+import os
+KAFKA_URL = os.getenv("KAFKA_URL")
+KAFKA_TOPIC = os.getenv("KAFKA_TOPIC")
 
-    # Produce data by selecting random values from these lists.
-    topic = "it4043e_group3_problem3"
-    user_ids = ['eabara', 'jsmith', 'sgarcia', 'jbernard', 'htanaka', 'awalther']
-    products = ['book', 'alarm clock', 't-shirts', 'gift card', 'batteries']
+from logger.logger import get_logger
+logger = get_logger("producer")
 
-    count = 0
-    for _ in range(10):
+def on_send_success(record_metadata):
+    logger.info((record_metadata.topic, record_metadata.partition, record_metadata.offset))
 
-        user_id = choice(user_ids)
-        product = choice(products)
-        producer.produce(topic, product, user_id, callback=delivery_callback)
-        count += 1
+def on_send_error(excp):
+    logger.error('Error in producer', exc_info=excp)
+    # handle exception
 
-    # Block until the messages are sent.
-    producer.poll(10000)
-    producer.flush()
+def value_serializer_func(data):
+    return json.dumps(data).encode('utf-8')
+
+class Producer():
+    def __init__(self):
+
+        # spark session
+        self._spark = get_spark_session(jobname="ProducerJob")
+
+        # kafka producer
+        self.producer = KafkaProducer(bootstrap_servers=[KAFKA_URL],
+                                      value_serializer=value_serializer_func)
+
+    def produce():
+        raise NotImplementedError
+
+if __name__ == "__main__":
+    producer = Producer()
+    producer.produce()
