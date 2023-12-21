@@ -16,7 +16,7 @@ partitions=${2:-$default_partitions}
 replication_factor=${3:-$default_replication_factor}
 
 # Kafka bootstrap server information
-bootstrap_server="35.240.206.212:9092"
+bootstrap_server="34.142.194.212:9092"
 
 # Creating the Kafka topic
 kafka-topics.sh --bootstrap-server $bootstrap_server --create --topic $topic_name \
