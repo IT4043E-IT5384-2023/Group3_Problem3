@@ -23,8 +23,8 @@ def value_deserializer_func(data):
 class Consumer():
     def __init__(self):
 
-        # spark session
-        self._spark = get_spark_session(jobname="SparkConsumerJob")
+        # # spark session
+        # self._spark = get_spark_session(jobname="SparkConsumerJob")
 
         # kafka producer
         self.consumer = KafkaConsumer(group_id="consumer_group",
@@ -32,6 +32,8 @@ class Consumer():
                                       bootstrap_servers=[KAFKA_URL],
                                       value_deserializer=value_deserializer_func,
                                       consumer_timeout_ms=2000)
+        
+        self.consumer.subscribe([KAFKA_TOPIC])
 
     def consume(self):
         raise NotImplementedError
