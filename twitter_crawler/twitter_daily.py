@@ -11,6 +11,11 @@ from logger.logger import get_logger
 logger = get_logger("crawler")
 
 NUM_ACCOUNTS = int(os.getenv("NUM_ACCOUNTS"))
+KEYWORDS = os.getenv("KEYWORDS").split()
+KEYWORDS_FOR_ACCOUNT = []
+chunk = len(KEYWORDS) // NUM_ACCOUNTS
+for i in range(NUM_ACCOUNTS):
+    KEYWORDS_FOR_ACCOUNT.append(KEYWORDS[i*chunk:(i+1)*chunk])
 
 def get_twitter_session(account_id):
     assert account_id <= NUM_ACCOUNTS
@@ -29,8 +34,8 @@ def crawl_tweet_kol_last_day(
     keywords: Union[str, List[str]],
     min_faves: int = 100,
     min_retweets: int = 10,
-    pages: int = 10,
-    wait_time: int = 30,
+    pages: int = 25,
+    wait_time: int = 12,
 ) -> List[Dict]:
     """
     Crawl tweets and KOL accounts from Twitter.

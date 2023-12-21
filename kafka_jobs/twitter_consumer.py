@@ -15,7 +15,7 @@ KAFKA_URL = os.getenv("KAFKA_URL")
 KAFKA_TOPIC = os.getenv("KAFKA_TOPIC")
 
 from logger.logger import get_logger
-logger = get_logger("producer")
+logger = get_logger("consumer")
 
 def value_deserializer_func(data):
     return json.loads(data.decode('utf-8'))
@@ -24,13 +24,16 @@ class Consumer():
     def __init__(self):
 
         # spark session
-        self._spark = get_spark_session(jobname="ProducerJob")
+        self._spark = get_spark_session(jobname="SparkConsumerJob")
 
         # kafka producer
-        self.consumer = KafkaConsumer(bootstrap_servers=[KAFKA_URL],
-                                      value_deserializer=value_deserializer_func)
+        self.consumer = KafkaConsumer(group_id="consumer_group",
+                                      auto_offset_reset='earliest',
+                                      bootstrap_servers=[KAFKA_URL],
+                                      value_deserializer=value_deserializer_func,
+                                      consumer_timeout_ms=2000)
 
-    def consume():
+    def consume(self):
         raise NotImplementedError
 
 if __name__ == "__main__":

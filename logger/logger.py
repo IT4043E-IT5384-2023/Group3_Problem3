@@ -1,3 +1,6 @@
+import sys
+sys.path.append(".")
+
 import logging
 import os
 from dotenv import load_dotenv
@@ -12,7 +15,7 @@ def get_logger(name):
     
     logger = logging.getLogger(name)
 
-    handler_file = logging.FileHandler(f"{LOG_DIR}/{name}.log", 'w')
+    handler_file = logging.FileHandler(f"{LOG_DIR}/{name}.log", 'a')
     handler_file.setFormatter(formatter)
     logger.addHandler(handler_file)
 

@@ -18,9 +18,21 @@ with DAG(dag_id="twitter_daily_dag",
          schedule="0 0 * * *"
          ) as dag:
     
-    producer_task = BashOperator(task_id="producer_task",
-                                 bash_command="cd ~/Documents/IT4043E_Group3_Problem3/kafka && python3 twitter_producer.py",
-                                 retries=1,
+    start_task = EmptyOperator(task_id="twitter_daily_dag_start")
+
+    producer_1_task = BashOperator(task_id="producer_1_task",
+                                 bash_command="cd ~/Documents/IT4043E_Group3_Problem3/kafka && python3 twitter_producer.py --acount-id 1",
+                                 retries=2,
+                                 max_active_tis_per_dag=1)
+
+    producer_2_task = BashOperator(task_id="producer_2_task",
+                                 bash_command="cd ~/Documents/IT4043E_Group3_Problem3/kafka && python3 twitter_producer.py --acount-id 2",
+                                 retries=2,
+                                 max_active_tis_per_dag=1)
+    
+    producer_3_task = BashOperator(task_id="producer_3_task",
+                                 bash_command="cd ~/Documents/IT4043E_Group3_Problem3/kafka && python3 twitter_producer.py --acount-id 3",
+                                 retries=2,
                                  max_active_tis_per_dag=1)
 
     consumer_task = BashOperator(task_id="consumer_task",
@@ -30,4 +42,4 @@ with DAG(dag_id="twitter_daily_dag",
 
     end_task = EmptyOperator(task_id="twitter_daily_dag_done")
     
-    producer_task >> consumer_task >> end_task
+    start_task >> (producer_1_task, producer_2_task, producer_2_task) >> consumer_task >> end_task
