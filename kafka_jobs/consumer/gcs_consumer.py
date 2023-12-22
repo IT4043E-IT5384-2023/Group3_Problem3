@@ -112,6 +112,9 @@ class Consumer():
             .withColumnRenamed("media_count", "media") \
             .withColumnRenamed("profile_image_url_https", "profile_image_url") \
             .withColumnRenamed("profile_banner_url", "background_image")
+        
+        # Coalesce to a single partition before writing to Parquet
+        parsed_df = parsed_df.coalesce(1)
 
         # Write the parsed messages to Parquet format
         parsed_df \
