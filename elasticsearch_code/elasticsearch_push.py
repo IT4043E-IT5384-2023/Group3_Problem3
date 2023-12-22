@@ -40,9 +40,9 @@ def process_csv(input_path, es, index):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", default="users_2023-12-14.csv", help="input file path")
+    parser.add_argument("--input", default="users_2023-12-15.csv", help="input file path")
     parser.add_argument("--config", default="infra.json", help="config file path")
-    parser.add_argument("--index", default = "g03_user", help="Elasitcsearch index name")
+    parser.add_argument("--index", default = "g03_user_dates", help="Elasitcsearch index name")
     args = parser.parse_args()
 
     input_path = args.input
