@@ -1,6 +1,8 @@
 import sys
 sys.path.append(".")
 
+import time
+import json
 from kafka import KafkaConsumer
 from kafka.errors import KafkaError
 from pyspark.sql import SparkSession
@@ -9,8 +11,6 @@ from pyspark.sql.types import StructType, StringType, IntegerType
 
 from dotenv import load_dotenv
 load_dotenv()
-
-import json
 
 import os
 KAFKA_URL = os.getenv("KAFKA_URL")
@@ -53,12 +53,15 @@ class Consumer():
 
     def get_data_from_kafka(self):
 
+        # wait for some seconds
+        time.sleep(5)
+
         # Read messages from Kafka
         df = self._spark \
             .readStream \
             .format("kafka") \
             .option("kafka.bootstrap.servers", KAFKA_URL) \
-            .option("kafka.group.id", "gcs_consumer_group") \
+            .option("kafka.group.id", "gcs_consumer_group_test") \
             .option("subscribe", KAFKA_TOPIC) \
             .option("startingOffsets", "earliest") \
             .load()
@@ -138,7 +141,7 @@ class Consumer():
                 .outputMode("append") \
                 .start()
             
-            stream.awaitTermination(36000)
+            stream.awaitTermination(3600)
 
         except Exception as e:
             logger.error(e)

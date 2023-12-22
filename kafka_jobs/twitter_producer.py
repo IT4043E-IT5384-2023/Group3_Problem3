@@ -47,7 +47,8 @@ class Producer():
         
     def create_topic(self, topic_name: str, partition: int = 3, replication_factor: int = 1):
         try:
-            admin_client = KafkaAdminClient(bootstrap_servers=KAFKA_URL)
+            admin_client = KafkaAdminClient(bootstrap_servers=KAFKA_URL,
+                                            api_version=(2, 5, 0))
 
             admin_client.create_topics(new_topics=[NewTopic(name=topic_name,
                                                             num_partitions=partition,
@@ -69,9 +70,13 @@ class Producer():
             wait_time=TWITTER_WAITTIME
         )
 
+        logger.info(f"Crawl {len(crawled_data)} tweets for keywords {KEYWORDS_FOR_ACCOUNT[self.producer_id-1]}")
+
         for tweet in crawled_data:
             self.producer.send(KAFKA_TOPIC, value=tweet).add_callback(on_send_success) \
                                                         .add_errback(on_send_error)
+            
+        self.producer.flush()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
