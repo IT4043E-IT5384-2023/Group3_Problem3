@@ -16,6 +16,8 @@ from twitter_crawler.twitter_daily import get_twitter_session,crawl_tweet_kol_la
 import os
 KAFKA_URL = os.getenv("KAFKA_URL")
 KAFKA_TOPIC = os.getenv("KAFKA_TOPIC")
+TWITTER_PAGES = os.getenv("PAGES")
+TWITTER_WAITTIME = os.getenv("WAIT_TIME")
 
 from logger.logger import get_logger
 
@@ -40,7 +42,7 @@ class Producer():
 
         # kafka producer
         self.producer = KafkaProducer(bootstrap_servers=[KAFKA_URL],
-                                      api_version=(3, 6, 1),
+                                      api_version=(2, 5, 0),
                                       value_serializer=value_serializer_func)
         
     def create_topic(self, topic_name: str, partition: int = 3, replication_factor: int = 1):
@@ -62,7 +64,9 @@ class Producer():
 
         crawled_data = crawl_tweet_kol_last_day(
             app=app,
-            keywords=KEYWORDS_FOR_ACCOUNT[self.producer_id-1]
+            keywords=KEYWORDS_FOR_ACCOUNT[self.producer_id-1],
+            pages=TWITTER_PAGES,
+            wait_time=TWITTER_WAITTIME
         )
 
         for tweet in crawled_data:

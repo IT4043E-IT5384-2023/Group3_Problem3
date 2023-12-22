@@ -21,25 +21,25 @@ with DAG(dag_id="twitter_daily_dag",
     start_task = EmptyOperator(task_id="twitter_daily_dag_start")
 
     producer_1_task = BashOperator(task_id="producer_1_task",
-                                 bash_command="cd ~/Documents/IT4043E_Group3_Problem3/kafka && python3 twitter_producer.py --acount-id 1",
+                                 bash_command="cd ~/Documents/IT4043E_Group3_Problem3 && python3 kafka_jobs/twitter_producer.py --producer-id 1",
                                  retries=2,
                                  max_active_tis_per_dag=1)
 
     producer_2_task = BashOperator(task_id="producer_2_task",
-                                 bash_command="cd ~/Documents/IT4043E_Group3_Problem3/kafka && python3 twitter_producer.py --acount-id 2",
+                                 bash_command="cd ~/Documents/IT4043E_Group3_Problem3 && python3 kafka_jobs/twitter_producer.py --producer-id 2",
                                  retries=2,
                                  max_active_tis_per_dag=1)
     
     producer_3_task = BashOperator(task_id="producer_3_task",
-                                 bash_command="cd ~/Documents/IT4043E_Group3_Problem3/kafka && python3 twitter_producer.py --acount-id 3",
+                                 bash_command="cd ~/Documents/IT4043E_Group3_Problem3 && python3 kafka_jobs/twitter_producer.py --producer-id 3",
                                  retries=2,
                                  max_active_tis_per_dag=1)
 
-    consumer_task = BashOperator(task_id="consumer_task",
-                                 bash_command="cd ~/Documents/IT4043E_Group3_Problem3/kafka && python3 twitter_consumer.py",
-                                 retries=1,
+    gcs_consumer_task = BashOperator(task_id="gcs_consumer_task",
+                                 bash_command="cd ~/Documents/IT4043E_Group3_Problem3 && python3 kafka_jobs/consumer/gcs_consumer.py",
+                                 retries=2,
                                  max_active_tis_per_dag=1)
 
     end_task = EmptyOperator(task_id="twitter_daily_dag_done")
     
-    start_task >> (producer_1_task, producer_2_task, producer_2_task) >> consumer_task >> end_task
+    start_task >> (producer_1_task, producer_2_task, producer_3_task) >> gcs_consumer_task >> end_task
