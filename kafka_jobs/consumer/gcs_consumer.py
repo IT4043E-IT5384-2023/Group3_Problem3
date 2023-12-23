@@ -29,6 +29,7 @@ class Consumer():
         # save paths
         self.local_save_path = "data"
         self.gsc_save_path = "gs://it4043e/it4043e_group3_problem3/data"
+        self.checkpoint_path = "data/checkpoints/gcs"
 
         # spark session
         self._spark = SparkSession \
@@ -143,9 +144,10 @@ class Consumer():
                 .trigger(processingTime='30 seconds') \
                 .foreachBatch(self.save_data) \
                 .outputMode("append") \
+                .option("checkpointLocation", self.checkpoint_path) \
                 .start()
             
-            stream.awaitTermination(3600)
+            stream.awaitTermination(30)
 
         except Exception as e:
             logger.error(e)

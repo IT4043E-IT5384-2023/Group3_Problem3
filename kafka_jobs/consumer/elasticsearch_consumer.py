@@ -30,6 +30,8 @@ def value_deserializer_func(data):
 class Consumer():
     def __init__(self):
 
+        self.checkpoint_path = "data/checkpoints/elasticsearch"
+
         # spark session
         self._spark = SparkSession.builder \
                                 .master("local") \
@@ -57,7 +59,7 @@ class Consumer():
 
         # Read messages from Kafka
         df = self._spark \
-            .read \
+            .readStream \
             .format("kafka") \
             .option("kafka.bootstrap.servers", KAFKA_URL) \
             .option("kafka.group.id", "elasticsearch_consumer_group_test") \
@@ -71,7 +73,7 @@ class Consumer():
         
         return df
     
-    def upload_data_to_elasticsearch(self, batch_df):
+    def upload_data_to_elasticsearch(self, batch_df, batch_id):
 
         records = batch_df.count()
 
@@ -122,7 +124,7 @@ class Consumer():
             .option("es.nodes", ELASTICSEARCH_URL) \
             .option("es.nodes.discovery", "false")\
             .option("es.nodes.wan.only", "true")\
-            .option("es.resource", "my_great_test_index") \
+            .option("es.resource", "g3tu") \
             .option("es.net.http.auth.user", ELASTICSEARCH_USER) \
             .option("es.net.http.auth.pass", ELASTICSEARCH_PASSWORD) \
             .option("es.mapping.id", "id") \
@@ -135,7 +137,15 @@ class Consumer():
     def consume(self):
         try: 
             df = self.get_data_from_kafka()
-            self.upload_data_to_elasticsearch(df)
+            stream = df \
+                .writeStream \
+                .trigger(processingTime='30 seconds') \
+                .foreachBatch(self.upload_data_to_elasticsearch) \
+                .outputMode("append") \
+                .option("checkpointLocation", self.checkpoint_path) \
+                .start()
+            
+            stream.awaitTermination(30)
 
         except Exception as e:
             logger.error(e)

@@ -18,6 +18,8 @@ KAFKA_URL = os.getenv("KAFKA_URL")
 KAFKA_TOPIC = os.getenv("KAFKA_TOPIC")
 TWITTER_PAGES = os.getenv("PAGES")
 TWITTER_WAITTIME = os.getenv("WAIT_TIME")
+TWITTER_MIN_FAVES = int(os.getenv("MIN_FAVES"))
+TWITTER_MIN_RETWEETS = int(os.getenv("MIN_RETWEETS"))
 
 from logger.logger import get_logger
 
@@ -66,6 +68,8 @@ class Producer():
         crawled_data = crawl_tweet_kol_last_day(
             app=app,
             keywords=KEYWORDS_FOR_ACCOUNT[self.producer_id-1],
+            min_faves=TWITTER_MIN_FAVES,
+            min_retweets=TWITTER_MIN_RETWEETS,
             pages=TWITTER_PAGES,
             wait_time=TWITTER_WAITTIME
         )
