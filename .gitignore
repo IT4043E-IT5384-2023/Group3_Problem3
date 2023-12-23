@@ -1,9 +1,12 @@
 # Optional files/extensions
 *.key
 *.tw_session
-data/
+*.csv
+*.json
 test.ipynb
 my_bash_script*
+*.jar
+data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

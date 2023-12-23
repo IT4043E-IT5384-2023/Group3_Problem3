@@ -1,18 +1,23 @@
 import requests
 from tweety import Twitter
 import pandas as pd
-from tweet_kol_crawler_v2 import convert_to_json
+from utils import convert_to_json
 import argparse
-import time
 from tqdm import tqdm
+
+from dotenv import load_dotenv
+load_dotenv()
+import os
+X_RapidAPI_Key = os.getenv("X-RapidAPI-Key")
+X_RapidAPI_Host = os.getenv("X-RapidAPI-Host")
 
 def get_follow(screenname):
     l = []
     url = 'https://twitter-api45.p.rapidapi.com/followers.php'
     querystring = {"screenname":screenname}
     headers = {
-        "X-RapidAPI-Key": "d5a581d56fmsh180438595a24a8ap195b14jsn7fc1c819012e",
-        "X-RapidAPI-Host": 'twitter-api45.p.rapidapi.com',
+        "X-RapidAPI-Key": X_RapidAPI_Key,
+        "X-RapidAPI-Host": X_RapidAPI_Host,
     }
     
     iter = 0
