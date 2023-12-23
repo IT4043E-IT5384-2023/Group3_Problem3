@@ -8,13 +8,6 @@
   - [Setup](#Setup)
   - [Kibana Dashboard](#kibana-dashboard)
   - [Data Structures](#data-structures)
-  - [Airflow DAGs](#airflow-dags)
-      - [Kafka Jobs DAG](#kafka-jobs-dag)
-      - [Batch Layer DAG](#batch-layer-dag)
-      - [Speed Layer DAG](#speed-layer-dag)
-  - [Report](#report)
-  - [Contact](#for-more-information)
-
 
 ## Introduction
 Collected social data need to be monitored to evaluate the quantity and quality which enable us to do these things below:
