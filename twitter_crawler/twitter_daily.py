@@ -74,6 +74,7 @@ def crawl_tweet_kol_last_day(
         all_tweets = app.search(search_str, pages = pages, wait_time = wait_time)
         for tweet in all_tweets:
             author_data = tweet['author'].__dict__
+            join_date = author_data['date'].strftime('%Y-%m-%d')
 
             used_key = ['id', 'name', 'username', 'bio',
                         'location', 'profile_url', 'statuses_count',
@@ -81,6 +82,7 @@ def crawl_tweet_kol_last_day(
                         'media_count', 'protected', 'verified', 'profile_image_url_https', 'profile_banner_url']
             filtered_data = {key: author_data[key] for key in used_key}
 
+            filtered_data['join_date'] = join_date
             filtered_data['crawled_date'] = current_date
 
             crawled_results.append(filtered_data)
