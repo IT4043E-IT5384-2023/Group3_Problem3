@@ -34,6 +34,11 @@ with DAG(dag_id="twitter_daily_dag",
                                  bash_command="cd ~/Documents/IT4043E_Group3_Problem3 && python3 kafka_jobs/twitter_producer.py --producer-id 3",
                                  retries=2,
                                  max_active_tis_per_dag=1)
+    
+    elasticsearch_consumer_task = BashOperator(task_id="elasticsearch_consumer_task",
+                                              bash_command="cd ~/Documents/IT4043E_Group3_Problem3 && python3 kafka_jobs/consumer/elasticsearch_consumer.py",
+                                              retries=2,
+                                              max_active_tis_per_dag=1)
 
     gcs_consumer_task = BashOperator(task_id="gcs_consumer_task",
                                  bash_command="cd ~/Documents/IT4043E_Group3_Problem3 && python3 kafka_jobs/consumer/gcs_consumer.py",
@@ -42,4 +47,4 @@ with DAG(dag_id="twitter_daily_dag",
 
     end_task = EmptyOperator(task_id="twitter_daily_dag_done")
     
-    start_task >> (producer_1_task, producer_2_task, producer_3_task) >> gcs_consumer_task >> end_task
+    start_task >> (producer_1_task, producer_2_task, producer_3_task) >> elasticsearch_consumer_task >> gcs_consumer_task >> end_task

@@ -13,12 +13,16 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import os
+os.environ['PYSPARK_SUBMIT_ARGS'] = '--jars ~/Documents/IT4043E_Group3_Problem3/jars/elasticsearch-spark-30_2.12-8.11.3.jar pyspark-shell'
 KAFKA_URL = os.getenv("KAFKA_URL")
 KAFKA_TOPIC = os.getenv("KAFKA_TOPIC")
+ELASTICSEARCH_URL = os.getenv("ELASTICSEARCH_URL")
+ELASTICSEARCH_USER = os.getenv("ELASTICSEARCH_USER")
+ELASTICSEARCH_PASSWORD = os.getenv("ELASTICSEARCH_PASSWORD")
 GOOGLE_APPLICATION_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
 from logger.logger import get_logger
-logger = get_logger("gcs_consumer")
+logger = get_logger("elasticsearch_consumer")
 
 def value_deserializer_func(data):
     return json.loads(data.decode('utf-8'))
@@ -26,20 +30,15 @@ def value_deserializer_func(data):
 class Consumer():
     def __init__(self):
 
-        # save paths
-        self.local_save_path = "data"
-        self.gsc_save_path = "gs://it4043e/it4043e_group3_problem3/data"
-
         # spark session
-        self._spark = SparkSession \
-                    .builder \
-                    .master('local') \
-                    .appName("GCSConsumer") \
-                    .config("spark.jars",
-                            "jars/gcs-connector-hadoop3-latest.jar") \
-                    .config("spark.jars.packages",
-                            "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0") \
-                    .getOrCreate()
+        self._spark = SparkSession.builder \
+                                .master("local") \
+                                .appName("ParquetToElasticsearch") \
+                                .config("spark.jars",
+                                        "jars/gcs-connector-hadoop3-latest,jars/elasticsearch-spark-30_2.12-8.9.1") \
+                                .config("spark.jars.packages",
+                                        "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.elasticsearch:elasticsearch-spark-30_2.12:8.9.1") \
+                                .getOrCreate()
 
         self._spark._jsc.hadoopConfiguration().set("google.cloud.auth.service.account.json.keyfile", GOOGLE_APPLICATION_CREDENTIALS)
         self._spark._jsc.hadoopConfiguration().set('fs.gs.impl', 'com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem')
@@ -58,10 +57,10 @@ class Consumer():
 
         # Read messages from Kafka
         df = self._spark \
-            .readStream \
+            .read \
             .format("kafka") \
             .option("kafka.bootstrap.servers", KAFKA_URL) \
-            .option("kafka.group.id", "gcs_consumer_group_test") \
+            .option("kafka.group.id", "elasticsearch_consumer_group_test") \
             .option("subscribe", KAFKA_TOPIC) \
             .option("startingOffsets", "earliest") \
             .load()
@@ -72,7 +71,7 @@ class Consumer():
         
         return df
     
-    def save_data(self, batch_df, batch_id):
+    def upload_data_to_elasticsearch(self, batch_df):
 
         records = batch_df.count()
 
@@ -117,35 +116,26 @@ class Consumer():
         # Coalesce to a single partition before writing to Parquet
         parsed_df = parsed_df.coalesce(1)
 
-        # Write the parsed messages to Parquet format
-        parsed_df \
-            .write \
-            .format("parquet") \
-            .option("path", self.local_save_path) \
+        # Write the data to Elasticsearch
+        parsed_df.write \
+            .format("org.elasticsearch.spark.sql") \
+            .option("es.nodes", ELASTICSEARCH_URL) \
+            .option("es.nodes.discovery", "false")\
+            .option("es.nodes.wan.only", "true")\
+            .option("es.resource", "my_great_test_index") \
+            .option("es.net.http.auth.user", ELASTICSEARCH_USER) \
+            .option("es.net.http.auth.pass", ELASTICSEARCH_PASSWORD) \
+            .option("es.mapping.id", "id") \
+            .option("es.write.operation", "upsert")\
             .mode("append") \
             .save()
-        
-        # parsed_df \
-        #     .write \
-        #     .format("parquet") \
-        #     .option("path", self.gsc_save_path) \
-        #     .mode("append") \
-        #     .save()
-        
-        logger.info(f"Save data to GCS: ({records} records)")
+
+        logger.info(f"Upload data to Elasticsearch: ({records} records)")
 
     def consume(self):
         try: 
             df = self.get_data_from_kafka()
-
-            stream = df \
-                .writeStream \
-                .trigger(processingTime='30 seconds') \
-                .foreachBatch(self.save_data) \
-                .outputMode("append") \
-                .start()
-            
-            stream.awaitTermination(3600)
+            self.upload_data_to_elasticsearch(df)
 
         except Exception as e:
             logger.error(e)
